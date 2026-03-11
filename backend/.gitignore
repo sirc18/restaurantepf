@@ -1,2 +1,3 @@
-data/mysql
-app/node_modules
+data/
+app/node_modules/
+.env

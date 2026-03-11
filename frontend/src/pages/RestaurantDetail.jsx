@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchRestaurantDetails } from '../services/api';
-import { Tabs, Tab, Badge } from 'react-bootstrap';
-import { ChevronLeft, ShoppingBag, UtensilsCrossed, User, Phone, Mail, Calendar, DollarSign } from 'lucide-react';
+import { Tabs, Tab, Badge, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { ChevronLeft, ShoppingBag, UtensilsCrossed, User, Phone, Mail, Calendar, DollarSign, Accessibility } from 'lucide-react';
 
 const RestaurantDetail = () => {
   const { id } = useParams();
@@ -48,9 +48,17 @@ const RestaurantDetail = () => {
         <div className="col-md-8">
           <h1 className="display-5 fw-bold mb-2">{restaurant.name}</h1>
           <p className="lead text-muted mb-4">{restaurant.description}</p>
-          <div className="d-flex gap-3">
+          <div className="d-flex flex-wrap gap-2">
              <Badge bg="primary" className="px-3 py-2 fs-6">{restaurant.address}</Badge>
              <Badge bg="warning" text="dark" className="px-3 py-2 fs-6">Rating: {restaurant.rating} ★</Badge>
+             <OverlayTrigger
+               placement="bottom"
+               overlay={<Tooltip id="arasaac-tooltip">Menú adaptado con pictogramas de ARASAAC para mejor accesibilidad cognitiva.</Tooltip>}
+             >
+               <Badge bg="success" className="px-3 py-2 fs-6 d-flex align-items-center gap-2">
+                 <Accessibility size={16} /> Accesible (ARASAAC)
+               </Badge>
+             </OverlayTrigger>
           </div>
         </div>
       </div>
@@ -59,13 +67,18 @@ const RestaurantDetail = () => {
         <Tab eventKey="dishes" title={<span className="d-flex align-items-center gap-2"><UtensilsCrossed size={18} /> Platos</span>}>
           <div className="row g-3 py-3">
             {dishes.length > 0 ? dishes.map(dish => (
-              <div key={dish.id} className="col-md-6">
-                <div className="card border-0 shadow-sm p-3 rounded-3 d-flex flex-row justify-content-between align-items-center">
-                  <div>
-                    <h5 className="mb-1 fw-bold">{dish.name}</h5>
-                    <span className="text-muted small">{dish.category}</span>
+              <div key={dish.id} className="col-md-6 mb-3">
+                <div className="card h-100 border-0 shadow-sm p-3 rounded-4 d-flex flex-row justify-content-between align-items-center dish-card">
+                  <div className="d-flex align-items-center gap-3">
+                    <div className="pictogram-container bg-light rounded-3 p-1">
+                      <img src={dish.pictogram} alt={dish.category} className="pictogram-img" title={dish.category} />
+                    </div>
+                    <div>
+                      <h5 className="mb-1 fw-bold">{dish.name}</h5>
+                      <span className="badge bg-light text-muted border">{dish.category}</span>
+                    </div>
                   </div>
-                  <span className="fs-5 fw-bold text-primary">{dish.price}€</span>
+                  <span className="fs-5 fw-bold text-primary ms-3">{dish.price}€</span>
                 </div>
               </div>
             )) : <p className="text-center py-4">No hay platos disponibles.</p>}
