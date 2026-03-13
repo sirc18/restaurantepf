@@ -6,14 +6,23 @@ export const fetchRestaurants = async () => {
     if (!response.ok) throw new Error('Error fetching restaurants');
     const data = await response.json();
     
-    return data.map(r => ({
-      id: r.restauranteID,
-      name: r.restaurante,
-      description: `Restaurante de calidad ubicado en ${r.barrio}. Especialistas en cocina local y ambiente acogedor.`,
-      image: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80`,
-      address: r.barrio,
-      rating: (4 + Math.random()).toFixed(1)
-    }));
+    return data.map((r, index) => {
+      const restaurantImages = [
+        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80', // Modern
+        'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=80', // Formal
+        'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80', // Cozy/Pizza
+        'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&q=80', // Bar/Tapas
+        'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=800&q=80'  // Healthy
+      ];
+      return {
+        id: r.restauranteID,
+        name: r.restaurante,
+        description: `Restaurante de calidad ubicado en ${r.barrio}. Especialistas en cocina local y ambiente acogedor.`,
+        image: restaurantImages[index % restaurantImages.length],
+        address: r.barrio,
+        rating: (4 + Math.random()).toFixed(1)
+      };
+    });
   } catch (error) {
     console.error(error);
     return [];
@@ -22,7 +31,6 @@ export const fetchRestaurants = async () => {
 
 export const fetchRestaurantDetails = async (id) => {
   try {
-    // parallel fetch for performance
     const [resResp, dishesResp, ordersResp, custResp, catsResp] = await Promise.all([
       fetch(`${API_URL}/restaurants`),
       fetch(`${API_URL}/dishes`),
@@ -40,11 +48,19 @@ export const fetchRestaurantDetails = async (id) => {
     const allCustomers = await custResp.json();
     const allCategories = await catsResp.json();
 
+    const restaurantImages = [
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=80',
+      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80',
+      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&q=80',
+      'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=800&q=80'
+    ];
+
     const restaurant = {
       id: rawRestaurant.restauranteID,
       name: rawRestaurant.restaurante,
       description: `Disfruta de la mejor experiencia gastronómica en ${rawRestaurant.barrio}.`,
-      image: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80`,
+      image: restaurantImages[(rawRestaurant.restauranteID - 1) % restaurantImages.length],
       address: rawRestaurant.barrio,
       rating: 4.8
     };
@@ -53,14 +69,29 @@ export const fetchRestaurantDetails = async (id) => {
       .filter(d => d.restauranteID === parseInt(id))
       .map(d => {
         const cat = allCategories.find(c => c.categoriaID === d.categoriaID);
-        // Map common categories to ARASAAC pictogram IDs (examples: 2356=pizza, 2350=meat, 2352=fish, 5459=dessert)
+        const dishName = d.plato.toLowerCase();
+        
+        // Keyword to Unsplash bridge
+        let photoKeyword = 'food';
+        if (dishName.includes('pizza')) photoKeyword = 'pizza';
+        else if (dishName.includes('hamburguesa') || dishName.includes('burger')) photoKeyword = 'burger';
+        else if (dishName.includes('ensalada') || dishName.includes('salad')) photoKeyword = 'salad';
+        else if (dishName.includes('carne') || dishName.includes('filete') || dishName.includes('ternasco')) photoKeyword = 'steak';
+        else if (dishName.includes('pescado') || dishName.includes('bacalao') || dishName.includes('sepia') || dishName.includes('calamar')) photoKeyword = 'seafood';
+        else if (dishName.includes('tarta') || dishName.includes('chocolate') || dishName.includes('postre')) photoKeyword = 'dessert';
+        else if (dishName.includes('croqueta') || dishName.includes('tapa')) photoKeyword = 'tapas';
+        else if (dishName.includes('pasta') || dishName.includes('macarrones') || dishName.includes('lasaña')) photoKeyword = 'pasta';
+        else if (dishName.includes('bocadillo') || dishName.includes('sandwich')) photoKeyword = 'sandwich';
+        else if (dishName.includes('pollo')) photoKeyword = 'chicken';
+
+        // ARASAAC Pictograms Mapping
         const pictogramMap = {
-          'Tapas y raciones': '35064', // Tapas
-          'Entrantes': '2337', // Food/Plate
+          'Tapas y raciones': '35064',
+          'Entrantes': '2337',
           'Pizzas': '2356', 
-          'Platos internacionales': '29532', // Globe/Food
-          'Bocadillos': '34267', // Sandwich
-          'Guarniciones': '31969', // Salad/Side
+          'Platos internacionales': '29532',
+          'Bocadillos': '34267',
+          'Guarniciones': '31969',
           'Carnes': '2350',
           'Pescados': '2352', 
           'Postres': '5459'
@@ -73,7 +104,10 @@ export const fetchRestaurantDetails = async (id) => {
           name: d.plato,
           price: d.precio,
           category: categoryName,
-          pictogram: `https://static.arasaac.org/pictograms/${pictId}/${pictId}_300.png`
+          pictogram: `https://static.arasaac.org/pictograms/${pictId}/${pictId}_300.png`,
+          photo: `https://images.unsplash.com/photo-1?w=400&q=40&auto=format&fit=crop&sig=${d.platoID}&${photoKeyword}` 
+          // Note: using a search query via unsplash source or featured is better for mocks
+          ,dummyPhoto: `https://loremflickr.com/400/300/${photoKeyword},food/all?lock=${d.platoID}`
         };
       });
 

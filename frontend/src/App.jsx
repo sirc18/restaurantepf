@@ -17,7 +17,7 @@ function App() {
       
       <footer className="bg-white border-top py-4 mt-5">
         <div className="container text-center">
-          <p className="text-muted mb-0">© 2026 GastroHub - Tu plataforma de restauración </p>
+          <p className="text-muted mb-0">© 2026 ZaragHub - Tu plataforma de restauración </p>
         </div>
       </footer>
     </div>

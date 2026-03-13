@@ -68,17 +68,17 @@ const RestaurantDetail = () => {
           <div className="row g-3 py-3">
             {dishes.length > 0 ? dishes.map(dish => (
               <div key={dish.id} className="col-md-6 mb-3">
-                <div className="card h-100 border-0 shadow-sm p-3 rounded-4 d-flex flex-row justify-content-between align-items-center dish-card">
-                  <div className="d-flex align-items-center gap-3">
-                    <div className="pictogram-container bg-light rounded-3 p-1">
-                      <img src={dish.pictogram} alt={dish.category} className="pictogram-img" title={dish.category} />
-                    </div>
-                    <div>
-                      <h5 className="mb-1 fw-bold">{dish.name}</h5>
-                      <span className="badge bg-light text-muted border">{dish.category}</span>
-                    </div>
+                <div className="card h-100 border-0 shadow-sm p-3 rounded-4 d-flex flex-row align-items-center dish-card">
+                  <div className="pictogram-container bg-light rounded-3 p-2 me-3">
+                    <img src={dish.pictogram} alt={dish.category} className="pictogram-img" title={dish.category} />
                   </div>
-                  <span className="fs-5 fw-bold text-primary ms-3">{dish.price}€</span>
+                  <div className="flex-grow-1">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <h5 className="mb-0 fw-bold">{dish.name}</h5>
+                      <span className="fs-5 fw-bold text-primary">{dish.price}€</span>
+                    </div>
+                    <span className="badge bg-light text-muted border mt-1">{dish.category}</span>
+                  </div>
                 </div>
               </div>
             )) : <p className="text-center py-4">No hay platos disponibles.</p>}

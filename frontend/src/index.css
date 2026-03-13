@@ -58,6 +58,7 @@ body {
 .title-gradient {
   background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 800;
 }
@@ -124,13 +125,32 @@ body {
 
 .dish-card {
   transition: all 0.2s ease;
-  border: 1px solid transparent !important;
+  border: 1px solid rgba(0,0,0,0.05) !important;
 }
 
 .dish-card:hover {
   border-color: #6366f1 !important;
-  transform: scale(1.01);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dish-thumbnail {
+  min-height: 100px;
+  min-width: 100px;
+}
+
+.pictogram-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: white;
+  padding: 4px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 .badge.bg-success {
